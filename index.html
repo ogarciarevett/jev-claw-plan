@@ -89,9 +89,9 @@
 
 <div class="wrap">
 <header>
-  <div class="eyebrow">Plan · Revision 2 · Not built · 2026-09-22</div>
+  <div class="eyebrow">Plan · Revision 2.1 · Opus 5.5 + Jev · Not built · 2026-09-22</div>
   <h1>jev-claw Build Plan</h1>
-  <p class="lead">Fork Hermes Agent and rebuild it entirely in Rust: the runtime core first, behind the Hermes RPC contract. Every agent is an actor with a mailbox, so peers talk while they run. Jev decides the gates. Voice on ElevenLabs. Desktop on Tauri 2.</p>
+  <p class="lead">Fork Hermes Agent and rebuild it entirely in Rust: the runtime core first, behind the Hermes RPC contract. Every agent is an actor with a mailbox inside one Rust daemon, so peers talk while they run. Jev decides the gates. Voice on ElevenLabs. Desktop on Tauri 2.</p>
   <div class="meta"><span>Owner: Omar Garcia</span><span>Judge: <code>jev-1.13.0</code></span><span>Decision log: <code>.local/jev-decisions/2026-09-21.jsonl</code></span></div>
 </header>
 
@@ -112,7 +112,7 @@
   <div class="stat"><b>239 ms</b><span>Jev median, one call, this machine</span></div>
   <div class="stat"><b>8 in 644 ms</b><span>choice verdicts in one call</span></div>
   <div class="stat"><b>516,287</b><span>Python lines in Hermes Agent to port</span></div>
-  <div class="stat"><b>5 of 14</b><span>decisions Jev settled across 3 rounds</span></div>
+  <div class="stat"><b>10 of 10</b><span>verdicts identical across two runs, round 4</span></div>
 </div>
 
 <h2 id="final">Final decisions</h2>
@@ -121,20 +121,19 @@
 <div class="table-wrap"><table>
 <thead><tr><th>#</th><th>Decision</th><th>Final</th><th>Who decided</th></tr></thead>
 <tbody>
-<tr><td class="num">d1</td><td>Build first</td><td>The Jev judge as a Rust crate and command line</td><td><span class="pill ok">Jev 0.81</span> same as Claude</td></tr>
+<tr><td class="num">d1</td><td>Build first</td><td>The Jev judge as a Rust crate and command line</td><td><span class="pill grey">Claude</span> Jev unsure in round 4 (0.09, 0.20)</td></tr>
 <tr><td class="num">d2</td><td>Code base</td><td><b>Superseded.</b> Fork Hermes Agent and port it to Rust</td><td><span class="pill grey">You</span></td></tr>
-<tr><td class="num">d2b</td><td>Port scope, release 1</td><td>Runtime core first: turn engine, tools, providers, store, orchestrator, skills, RPC contract. Channels, cron, dashboard, evals later</td><td><span class="pill warn">Safe default</span> Jev unsure 0.68</td></tr>
-<tr><td class="num">d3</td><td>Jev in the loop</td><td>Named points only. Every-turn router as a flagged experiment</td><td><span class="pill warn">Safe default</span> Jev unsure 0.37</td></tr>
-<tr><td class="num">d4</td><td>Self-improvement scope</td><td>Skill text and Jev question packs only. A person accepts. No self-written code</td><td><span class="pill ok">Jev 0.87</span> same as Claude</td></tr>
-<tr><td class="num">d5</td><td>App and core</td><td>The Tauri 2 shell links the core crate in process</td><td><span class="pill warn">Safe default</span> Jev unsure 0.56</td></tr>
-<tr><td class="num">d6</td><td>Memory and run log</td><td>SQLite with WAL and FTS5, the Hermes schema kept</td><td><span class="pill grey">Claude</span> Jev unclear 0.92</td></tr>
-<tr><td class="num">d7</td><td>Providers</td><td>Own trait. See d12</td><td><span class="pill warn">Safe default</span></td></tr>
-<tr><td class="num">d8</td><td>TypeScript judge</td><td>Test oracle until the Rust judge passes the same cases, then delete</td><td><span class="pill ok">Jev 0.94</span> same as Claude</td></tr>
+<tr><td class="num">d2b</td><td>Port scope, release 1</td><td>Runtime core first: turn engine, tools, providers, store, orchestrator, skills, RPC contract. Channels, cron, dashboard, evals later</td><td><span class="pill warn">Safe default</span> Jev unsure (0.75, 0.70)</td></tr>
+<tr><td class="num">d3</td><td>Jev in the loop</td><td>Named points only. Every-turn router as a flagged experiment</td><td><span class="pill warn">Safe default</span> Jev unsure (0.34, 0.25)</td></tr>
+<tr><td class="num">d4</td><td>Self-improvement scope</td><td>Skill text and Jev question packs only. A person accepts. No self-written code</td><td><span class="pill ok">Jev 0.81, 0.82</span> same as Claude</td></tr>
+<tr><td class="num">d5</td><td>App and core</td><td><b>Changed.</b> One Rust daemon runs agents. Tauri app, CLI and TUI are clients over the RPC contract</td><td><span class="pill ok">Jev 1.00 twice</span> same as Claude (Opus 5.5). Replaces <code>linked_core</code></td></tr>
+<tr><td class="num">d6</td><td>Memory and run log</td><td>SQLite with WAL and FTS5, the Hermes schema kept</td><td><span class="pill ok">Jev 1.00 twice</span> was "unclear", same as Claude</td></tr>
+<tr><td class="num">d8</td><td>TypeScript judge</td><td>Test oracle until the Rust judge passes the same cases, then delete</td><td><span class="pill ok">Jev 0.99 twice</span> same as Claude</td></tr>
 <tr><td class="num">d9</td><td>Multi-agent model</td><td>Actors with mailboxes, typed peer messages, one shared task board, replayable message log</td><td><span class="pill grey">You, overruling Jev</span> Jev chose <code>hierarchy_only</code> at 0.82. Your direction is the named fact that overrules it</td></tr>
 <tr><td class="num">d10</td><td>Voice</td><td>ElevenLabs conversational agents, with the Rust agent as brain and tools, behind a voice trait</td><td><span class="pill grey">You</span> Jev unsure 0.53</td></tr>
-<tr><td class="num">d11</td><td>Desktop app</td><td>Tauri 2 shell that links the core and reuses the Hermes React dashboard over the RPC contract</td><td><span class="pill warn">Claude, on your Tauri 2 rule</span> Jev unsure 0.13. <b>Your call</b></td></tr>
-<tr><td class="num">d12</td><td>Provider breadth</td><td>Anthropic and OpenAI-compatible first, behind the trait. The other 36 profiles ported as data later</td><td><span class="pill warn">Safe default</span> Jev unsure 0.36</td></tr>
-<tr><td class="num">d13</td><td>Jev in the orchestrator</td><td>Jev decides tool risk gates and stop or continue only. Worker choice is by rules</td><td><span class="pill ok">Jev 0.83</span> followed</td></tr>
+<tr><td class="num">d11</td><td>Desktop app</td><td>Tauri 2 client that reuses the Hermes React dashboard over the RPC contract</td><td><span class="pill warn">Claude, on your Tauri 2 rule</span> Jev unsure (0.10, 0.11). <b>Your call</b></td></tr>
+<tr><td class="num">d12</td><td>Provider breadth</td><td>Anthropic and OpenAI-compatible first, behind the trait. The other 36 profiles ported as data later</td><td><span class="pill ok">Jev 1.00, 0.99</span> same as Claude</td></tr>
+<tr><td class="num">d13</td><td>Jev in the orchestrator</td><td>Jev decides tool risk gates and stop or continue only. Worker choice is by rules</td><td><span class="pill warn">Safe default</span> Jev 0.83 in round 3, unsure 0.53 in round 4</td></tr>
 </tbody></table></div>
 
 <div class="ask">
@@ -145,6 +144,23 @@
 </div>
 
 <h2 id="log">Decision log</h2>
+<h3>Round 4: re-run with Opus 5.5</h3>
+<p>Claude (now Opus 5.5) wrote fresh picks first, then asked the ten open decisions in one call, twice. <code>jev-1.13.0</code>, 969 ms and 685 ms. All ten verdicts were the same in both runs. Jev decided 6 of 10, and all 6 match Claude's fresh pick.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>id</th><th>Run 1</th><th>Run 2</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td class="num">d1</td><td><span class="pill warn">undecided</span> 0.09</td><td><span class="pill warn">undecided</span> 0.20</td><td>Claude pick <code>rust_judge_first</code></td></tr>
+<tr><td class="num">d2b</td><td><span class="pill warn">undecided</span> 0.75</td><td><span class="pill warn">undecided</span> 0.70</td><td>Safe default <code>core_first</code></td></tr>
+<tr><td class="num">d3</td><td><span class="pill warn">undecided</span> 0.34</td><td><span class="pill warn">undecided</span> 0.25</td><td>Safe default <code>jev_named_points</code></td></tr>
+<tr><td class="num">d4</td><td><span class="pill ok">skills_and_question_packs</span> 0.81</td><td><span class="pill ok">same</span> 0.82</td><td>Followed</td></tr>
+<tr><td class="num">d5</td><td><span class="pill ok">daemon_and_clients</span> 1.00</td><td><span class="pill ok">same</span> 1.00</td><td><b>Followed. Changes the plan</b></td></tr>
+<tr><td class="num">d6</td><td><span class="pill ok">sqlite_fts5</span> 1.00</td><td><span class="pill ok">same</span> 1.00</td><td>Followed</td></tr>
+<tr><td class="num">d8</td><td><span class="pill ok">keep_as_oracle_then_delete</span> 0.99</td><td><span class="pill ok">same</span> 0.99</td><td>Followed</td></tr>
+<tr><td class="num">d11</td><td><span class="pill warn">undecided</span> 0.10</td><td><span class="pill warn">undecided</span> 0.11</td><td>Your call</td></tr>
+<tr><td class="num">d12</td><td><span class="pill ok">two_then_trait</span> 1.00</td><td><span class="pill ok">same</span> 0.99</td><td>Followed</td></tr>
+<tr><td class="num">d13</td><td><span class="pill warn">undecided</span> 0.53</td><td><span class="pill warn">undecided</span> 0.53</td><td>Safe default <code>jev_gates_only</code></td></tr>
+</tbody></table></div>
+<p><b>d5 flips to a daemon.</b> Hermes runs detached subagents, cron and channels, and its desktop, TUI and dashboard are already RPC clients. With those facts, Jev chose <code>daemon_and_clients</code> at 1.00. The round 1 choice was made before Hermes was the base. d13 moved the other way (0.83 to 0.53): Jev is stable on the same input but sensitive to how the facts are written.</p>
 <h3>Round 3: the Hermes port</h3>
 <p>One call, 831 ms, six <code>choice</code> questions over twelve facts from the Hermes map. Jev decided 2 of 6.</p>
 <div class="table-wrap"><table>
@@ -249,7 +265,7 @@ flowchart LR
   J{Jev gates} --- A
   J --- B
 </pre>
-<p>The desktop app is <code>apps/desktop</code>: a Tauri 2 shell whose <code>lib.rs</code> links the core, streams over the Channel API, and hosts the Hermes React dashboard against <code>claw-rpc</code> (d11, your call).</p>
+<p>Process model (d5, changed in round 4): one Rust daemon, <code>clawd</code>, runs every agent actor, cron and background work. The Tauri 2 app, the CLI and the Hermes TUI are clients over <code>claw-rpc</code>. The Tauri app hosts the Hermes React dashboard (d11, your call) and can start the daemon when it is not running.</p>
 <p>Four rules hold in the product. Jev sorts a case into named buckets and never writes text or calls a tool. Every <code>choice</code> keeps a no-match option. <code>undecided</code> never means yes: it takes the safe default, which for a tool is "ask the user". Every verdict is logged with its masked question, number and latency.</p>
 <p>Where the speed comes from: a native binary with no runtime to start, many Jev questions in one call, Jev checks that run at the same time as the model stream, and skill selection by a verdict instead of a model planning turn.</p>
 
