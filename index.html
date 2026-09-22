@@ -89,9 +89,9 @@
 
 <div class="wrap">
 <header>
-  <div class="eyebrow">Plan · Not built · 2026-09-22</div>
+  <div class="eyebrow">Plan · Revision 2 · Not built · 2026-09-22</div>
   <h1>jev-claw Build Plan</h1>
-  <p class="lead">A new small Rust workspace. Port the Jev judge to Rust first. Put Jev at named decision points in the agent loop. Let the agent improve only skill text and question packs, with a person accepting each change. Desktop app on Tauri 2.</p>
+  <p class="lead">Fork Hermes Agent and rebuild it entirely in Rust: the runtime core first, behind the Hermes RPC contract. Every agent is an actor with a mailbox, so peers talk while they run. Jev decides the gates. Voice on ElevenLabs. Desktop on Tauri 2.</p>
   <div class="meta"><span>Owner: Omar Garcia</span><span>Judge: <code>jev-1.13.0</code></span><span>Decision log: <code>.local/jev-decisions/2026-09-21.jsonl</code></span></div>
 </header>
 
@@ -111,35 +111,54 @@
 <div class="stats">
   <div class="stat"><b>239 ms</b><span>Jev median, one call, this machine</span></div>
   <div class="stat"><b>8 in 644 ms</b><span>choice verdicts in one call</span></div>
-  <div class="stat"><b>3 of 8</b><span>decisions Jev settled, all matching Claude</span></div>
-  <div class="stat"><b>0 of 22</b><span>open design scores Jev was sure on</span></div>
+  <div class="stat"><b>516,287</b><span>Python lines in Hermes Agent to port</span></div>
+  <div class="stat"><b>5 of 14</b><span>decisions Jev settled across 3 rounds</span></div>
 </div>
 
 <h2 id="final">Final decisions</h2>
-<p>Jev decided 3 of 8. Five took their safe default (the option that changes least). Two need you. Nothing is built.</p>
+<p>Revised after your direction: fork Hermes Agent and rebuild it entirely in Rust, with real multi-agent, and Jev on top. The fork exists at <a href="https://github.com/ogarciarevett/hermes-agent">ogarciarevett/hermes-agent</a>. Nothing is built.</p>
+<p>The port covers the Hermes runtime core first, behind the Hermes RPC contract. Every agent becomes an actor with a mailbox, so peers can talk while they run. Voice comes from ElevenLabs behind a small voice trait. Jev decides tool risk gates and stop or continue; the orchestrator picks workers by rules.</p>
 <div class="table-wrap"><table>
 <thead><tr><th>#</th><th>Decision</th><th>Final</th><th>Who decided</th></tr></thead>
 <tbody>
 <tr><td class="num">d1</td><td>Build first</td><td>The Jev judge as a Rust crate and command line</td><td><span class="pill ok">Jev 0.81</span> same as Claude</td></tr>
-<tr><td class="num">d2</td><td>Code base</td><td>New workspace that borrows ZeroClaw designs and snippets with attribution. No fork</td><td><span class="pill warn">Safe default</span> Jev unsure 0.61, same as Claude</td></tr>
-<tr><td class="num">d3</td><td>Jev in the loop</td><td>Named points only: tool risk gate, skill selection, stop or continue, memory write. Every-turn router as a flagged experiment</td><td><span class="pill warn">Safe default</span> Claude wanted the router. Jev unsure 0.37. <b>Your call</b></td></tr>
-<tr><td class="num">d4</td><td>Self-improvement scope</td><td>Skill text and Jev question packs only. A person accepts. Revert by file. No self-written code</td><td><span class="pill ok">Jev 0.87</span> same as Claude</td></tr>
-<tr><td class="num">d5</td><td>App and core</td><td>The Tauri 2 app links the core crate in process. The command line links the same crate</td><td><span class="pill warn">Safe default</span> Jev unsure 0.56, same as Claude. <b>Your call</b></td></tr>
-<tr><td class="num">d6</td><td>Memory and run log</td><td>One SQLite file with full-text search. Skills stay as <code>SKILL.md</code> files</td><td><span class="pill grey">Claude</span> Jev said unclear 0.92</td></tr>
-<tr><td class="num">d7</td><td>Providers</td><td>Own small trait, two providers: Anthropic and any OpenAI-compatible endpoint</td><td><span class="pill warn">Safe default</span> Jev unsure 0.50, same as Claude</td></tr>
-<tr><td class="num">d8</td><td>TypeScript copy</td><td>Keep as the test oracle until the Rust judge passes the same cases, then delete</td><td><span class="pill ok">Jev 0.94</span> same as Claude</td></tr>
+<tr><td class="num">d2</td><td>Code base</td><td><b>Superseded.</b> Fork Hermes Agent and port it to Rust</td><td><span class="pill grey">You</span></td></tr>
+<tr><td class="num">d2b</td><td>Port scope, release 1</td><td>Runtime core first: turn engine, tools, providers, store, orchestrator, skills, RPC contract. Channels, cron, dashboard, evals later</td><td><span class="pill warn">Safe default</span> Jev unsure 0.68</td></tr>
+<tr><td class="num">d3</td><td>Jev in the loop</td><td>Named points only. Every-turn router as a flagged experiment</td><td><span class="pill warn">Safe default</span> Jev unsure 0.37</td></tr>
+<tr><td class="num">d4</td><td>Self-improvement scope</td><td>Skill text and Jev question packs only. A person accepts. No self-written code</td><td><span class="pill ok">Jev 0.87</span> same as Claude</td></tr>
+<tr><td class="num">d5</td><td>App and core</td><td>The Tauri 2 shell links the core crate in process</td><td><span class="pill warn">Safe default</span> Jev unsure 0.56</td></tr>
+<tr><td class="num">d6</td><td>Memory and run log</td><td>SQLite with WAL and FTS5, the Hermes schema kept</td><td><span class="pill grey">Claude</span> Jev unclear 0.92</td></tr>
+<tr><td class="num">d7</td><td>Providers</td><td>Own trait. See d12</td><td><span class="pill warn">Safe default</span></td></tr>
+<tr><td class="num">d8</td><td>TypeScript judge</td><td>Test oracle until the Rust judge passes the same cases, then delete</td><td><span class="pill ok">Jev 0.94</span> same as Claude</td></tr>
+<tr><td class="num">d9</td><td>Multi-agent model</td><td>Actors with mailboxes, typed peer messages, one shared task board, replayable message log</td><td><span class="pill grey">You, overruling Jev</span> Jev chose <code>hierarchy_only</code> at 0.82. Your direction is the named fact that overrules it</td></tr>
+<tr><td class="num">d10</td><td>Voice</td><td>ElevenLabs conversational agents, with the Rust agent as brain and tools, behind a voice trait</td><td><span class="pill grey">You</span> Jev unsure 0.53</td></tr>
+<tr><td class="num">d11</td><td>Desktop app</td><td>Tauri 2 shell that links the core and reuses the Hermes React dashboard over the RPC contract</td><td><span class="pill warn">Claude, on your Tauri 2 rule</span> Jev unsure 0.13. <b>Your call</b></td></tr>
+<tr><td class="num">d12</td><td>Provider breadth</td><td>Anthropic and OpenAI-compatible first, behind the trait. The other 36 profiles ported as data later</td><td><span class="pill warn">Safe default</span> Jev unsure 0.36</td></tr>
+<tr><td class="num">d13</td><td>Jev in the orchestrator</td><td>Jev decides tool risk gates and stop or continue only. Worker choice is by rules</td><td><span class="pill ok">Jev 0.83</span> followed</td></tr>
 </tbody></table></div>
-<p>Why Claude keeps SQLite for d6 after Jev said "unclear": the improvement loop must join each verdict to its later outcome. That is a query, not a file read. ZeroClaw and Hermes both use SQLite for memory.</p>
 
 <div class="ask">
-  <h3>Two decisions need you</h3>
+  <h3>One decision needs you</h3>
   <ol>
-    <li><b>d3, every-turn router.</b> Option A: named points only in release 1, router as an experiment (recommended). Option B: router on every turn from the start. A is safer because Jev was unsure on 22 of 22 open scores today. B is the bolder speed story: the model call can start in parallel and be cancelled, so the router adds no wait.</li>
-    <li><b>d5, daemon.</b> Option A: in-process core for release 1 (recommended). Option B: daemon plus clients from the start. Choose B only if release 1 must run schedules or chat channels while the app is closed. ZeroClaw and Hermes both chose B.</li>
+    <li><b>d11, desktop app.</b> Option A: Tauri 2 shell that reuses the Hermes React dashboard (recommended, least UI work, keeps your Tauri 2 rule). Option B: Tauri 2 shell with a new small chat-first UI. B costs more UI work but drops 57,000 lines of dashboard code.</li>
   </ol>
 </div>
 
 <h2 id="log">Decision log</h2>
+<h3>Round 3: the Hermes port</h3>
+<p>One call, 831 ms, six <code>choice</code> questions over twelve facts from the Hermes map. Jev decided 2 of 6.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>id</th><th>Decision</th><th>Options</th><th>Jev verdict</th><th>Number</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td class="num">d2b</td><td>Port scope</td><td><code>core_first</code> <code>everything</code> <code>rust_core_python_sidecar</code></td><td><span class="pill warn">undecided</span></td><td class="num">0.68</td><td>Safe default <code>core_first</code></td></tr>
+<tr><td class="num">d9</td><td>Multi-agent model</td><td><code>actors_and_blackboard</code> <code>hierarchy_only</code> <code>external_bus</code></td><td><span class="pill ok">hierarchy_only</span></td><td class="num">0.82</td><td><b>Overruled</b> by the owner's direction. Recorded, not followed</td></tr>
+<tr><td class="num">d10</td><td>Voice</td><td><code>elevenlabs_agents</code> <code>own_voice_agent</code> <code>both_pluggable</code></td><td><span class="pill warn">undecided</span></td><td class="num">0.53</td><td>Owner choice <code>elevenlabs_agents</code></td></tr>
+<tr><td class="num">d11</td><td>Desktop app</td><td><code>tauri_reuse_web_ui</code> <code>keep_electron</code> <code>tauri_new_ui</code></td><td><span class="pill warn">undecided</span></td><td class="num">0.13</td><td>Owner rule: Tauri 2. Variant open</td></tr>
+<tr><td class="num">d12</td><td>Provider breadth</td><td><code>two_then_trait</code> <code>all_38</code></td><td><span class="pill warn">undecided</span></td><td class="num">0.36</td><td>Safe default <code>two_then_trait</code></td></tr>
+<tr><td class="num">d13</td><td>Jev in the orchestrator</td><td><code>jev_routes_work</code> <code>jev_gates_only</code></td><td><span class="pill ok">jev_gates_only</span></td><td class="num">0.83</td><td>Followed</td></tr>
+</tbody></table></div>
+<p>The d9 verdict is worth keeping. Jev read "delegation is real" and "the team is one owner" and chose the smaller design. The owner overrules it on product grounds. That is the protocol working: a verdict is an input, and the owner's explicit choice always wins.</p>
+<h3>Rounds 1 and 2: the first plan</h3>
 <p>Claude wrote the inventory and its own pick first, then asked with neutral text and the same ten facts for every option. 32 calls, all logged with <code>--log</code>.</p>
 <div class="table-wrap"><table>
 <thead><tr><th>id</th><th>Decision</th><th>Options</th><th>Claude pick</th><th>Jev verdict</th><th>Number</th><th>Result</th></tr></thead>
@@ -180,7 +199,8 @@
 <p>Test result: 109 pass, 2 fail, 1 load error, 111 tests in 8 files. Both causes are ties to the Edel repository. The boundary test reads an Edel <code>package.json</code>, and <code>jev-question-pack.test.ts</code> imports <code>packages/contracts/src/eval-status</code>. These stay until the Rust port replaces them.</p>
 
 <h2 id="borrow">What we borrow</h2>
-<p>Only ZeroClaw is Rust, so it is the only source of code. Hermes and Vesper give ideas.</p>
+<p><b>Revision:</b> Hermes Agent is now the base, not a source of ideas. A mapper read the clone at commit <code>e2f8a07</code> (2026-09-22). Hermes is 516,287 lines of Python: agent 124,555, tools 115,108, hermes_cli 233,329, gateway 92,952, tui_gateway 37,795, plugins 90,503, cron 16,850, state 18,413. The Electron desktop app is about 641,000 lines of TypeScript, the TUI about 101,000, the web dashboard about 57,000. Delegation is real: a parent spawns children in parallel, joined or detached, with list, steer and stop. There is no peer-to-peer agent protocol; a shared SQLite kanban board is the only coordination between independent agents. That gap is what jev-claw fills.</p>
+<p>ZeroClaw still gives Rust code and designs. Vesper gives the improvement loop.</p>
 <div class="table-wrap"><table>
 <thead><tr><th>Project</th><th>What it is</th><th>License</th><th>Take</th><th>Leave</th></tr></thead>
 <tbody>
@@ -194,32 +214,42 @@
 <p>Tauri 2 facts: stable is 2.11.5 (2026-07-01). App logic lives in a library crate, so a CLI crate can share it. The Channel API is the documented way to stream tokens to the webview. iOS and Android work, but not every plugin supports them.</p>
 
 <h2 id="arch">Architecture</h2>
-<p>One Cargo workspace. One core library. Two thin front ends (command line and Tauri 2 app) that link it. Seven crates in release 1, against about 20 in ZeroClaw.</p>
+<p>One Cargo workspace that mirrors the Hermes runtime, one crate per Hermes subsystem, plus two new crates: the Jev judge and the actor orchestrator. Two thin front ends (command line and Tauri 2 shell) link the core. The Hermes RPC contract (about 100 JSON-RPC methods) stays stable so the existing React dashboard and TUI keep working.</p>
 <div class="table-wrap"><table>
-<thead><tr><th>Crate</th><th>Job</th><th>Comes from</th></tr></thead>
+<thead><tr><th>Crate</th><th>Hermes source</th><th>Lines today</th><th>Strategy</th></tr></thead>
 <tbody>
-<tr><td><code>jev-judge</code></td><td>Typed client for Jev: <code>noul</code>, <code>choice</code>, <code>score</code>. Threshold, <code>undecided</code> on every failure, retry only on 429, mask before send, decision log</td><td>Port of <code>judge.ts</code> and <code>mask.ts</code></td></tr>
-<tr><td><code>claw-core</code></td><td>The agent loop, the <code>Tool</code> and <code>ModelProvider</code> traits, the decision points, the autonomy policy</td><td>ZeroClaw trait split, Jev skill protocol</td></tr>
-<tr><td><code>claw-providers</code></td><td>Anthropic and OpenAI-compatible streaming clients</td><td>Own code</td></tr>
-<tr><td><code>claw-tools</code></td><td>File, shell, web fetch, MCP client. Each tool declares a risk level and capabilities</td><td>ZeroClaw supervised autonomy, Vesper capability list</td></tr>
-<tr><td><code>claw-store</code></td><td>One SQLite file: sessions, memory with FTS5, run log, verdict and outcome pairs</td><td>Hermes and ZeroClaw memory design</td></tr>
-<tr><td><code>claw-improve</code></td><td>Gather, propose, score on held-out tasks, candidate, accept, revert</td><td>Vesper <code>auto-evolve</code> and <code>skill-train</code></td></tr>
-<tr><td><code>claw-cli</code></td><td>Command line, MCP server with the <code>jev_judge</code> tool, Claude Code Stop hook</td><td>Port of <code>jev-judge.ts</code>, <code>jev-mcp-server.ts</code>, <code>jev-stop-hook.ts</code></td></tr>
+<tr><td><code>jev-judge</code></td><td>new, port of <code>scripts/jev</code></td><td class="num">1,200 (TS)</td><td>Port with the 109 tests as oracle</td></tr>
+<tr><td><code>claw-turn</code></td><td><code>agent/conversation_loop.py</code>, <code>turn_*.py</code>, <code>tool_executor.py</code></td><td class="num">~8,000</td><td>Redesign: the reflection phase dispatch becomes a typed state machine</td></tr>
+<tr><td><code>claw-compaction</code></td><td><code>agent/context_compressor.py</code>, <code>conversation_compression.py</code></td><td class="num">~10,000</td><td>Keep the head and tail protect, middle summarize algorithm. Redesign the thread plumbing</td></tr>
+<tr><td><code>claw-tools</code></td><td><code>tools/registry.py</code>, <code>toolsets.py</code>, <code>model_tools.py</code>, core tools</td><td class="num">~45 tools</td><td>Trait registry with compile-time registration and tokio tasks</td></tr>
+<tr><td><code>claw-sandbox</code></td><td><code>tools/environments/*</code></td><td class="num">8 backends</td><td>Local first, docker and ssh next</td></tr>
+<tr><td><code>claw-providers</code></td><td><code>providers/base.py</code>, <code>agent/*_adapter.py</code></td><td class="num">38 profiles</td><td>Trait plus two providers first (d12)</td></tr>
+<tr><td><code>claw-store</code></td><td><code>hermes_state_*.py</code></td><td class="num">18,413</td><td>Keep schema, WAL, FTS5 with CJK. Drop 2,500 lines of lock, repair and portability plumbing</td></tr>
+<tr><td><code>claw-orchestrator</code></td><td><code>tools/delegate_tool*.py</code>, <code>subagent_lifecycle.py</code>, kanban</td><td class="num">6,317 + 1,190</td><td>Redesign and expand: actors with mailboxes, typed peer messages, task board, replayable log (d9)</td></tr>
+<tr><td><code>claw-skills</code></td><td><code>skills/</code>, <code>skill_manager_tool.py</code></td><td class="num">11,663 + 952</td><td>Port the index and lazy load pattern. Add the Jev-scored improvement loop</td></tr>
+<tr><td><code>claw-rpc</code></td><td><code>tui_gateway/</code></td><td class="num">37,795</td><td>Port the contract as one typed request enum with serde</td></tr>
+<tr><td><code>claw-voice</code></td><td>new</td><td class="num">0</td><td>Voice trait, ElevenLabs first (d10)</td></tr>
+<tr><td><code>claw-cli</code></td><td><code>cli.py</code>, <code>hermes_cli/</code> subset</td><td class="num">1,820 + subset</td><td>Port the commands the core needs. The 233,000 line dashboard server waits</td></tr>
+<tr><td>Later</td><td><code>gateway/</code> channels, <code>cron/</code>, <code>acp_adapter/</code>, <code>plugins/platforms/</code></td><td class="num">~200,000</td><td>Release 2 and after, behind the same contract</td></tr>
+<tr><td>Dropped from core</td><td><code>batch_runner.py</code>, <code>mini_swe_runner.py</code>, <code>trajectory_compressor.py</code>, <code>evals/</code></td><td class="num">~22,000</td><td>Offline eval tooling, not runtime</td></tr>
 </tbody></table></div>
-<p>The desktop app is <code>apps/desktop</code>: a Tauri 2 shell whose <code>lib.rs</code> links <code>claw-core</code>, streams model output over the Channel API, and keeps keys in the OS keychain. The shell owns files and windows, the web view owns the chat.</p>
+<p>The multi-agent model, d9: every agent is a tokio task that owns a mailbox. Messages are typed and serialized, so the log can replay any run. A parent still spawns children as Hermes does, but a child can also message a peer, claim work on the task board, or hand off. The orchestrator is one actor, not special code. Jev sits at the risk gates and the stop or continue points of every actor (d13).</p>
 <pre class="mermaid">
-flowchart TD
-  U[User input] --> S[Jev: pick skill or none]
-  S --> M[Model turn: streams text and tool calls]
-  M --> R[Jev: tool risk gate]
-  R -->|safe| T[Run tool]
-  R -->|risky or undecided| H[Ask the user]
-  T --> C[Jev: stop or continue]
-  H --> C
-  C -->|continue| M
-  C -->|stop| W[Jev: worth a memory write?]
-  W --> L[Run log and verdict log]
+flowchart LR
+  O[Orchestrator actor] -- spawn --> A[Worker A]
+  O -- spawn --> B[Worker B]
+  A -- typed message --> B
+  B -- typed message --> A
+  A -- claim / done --> T[(Task board)]
+  B -- claim / done --> T
+  O -- read --> T
+  A -. every message .-> L[(Replayable log)]
+  B -. every message .-> L
+  O -. every message .-> L
+  J{Jev gates} --- A
+  J --- B
 </pre>
+<p>The desktop app is <code>apps/desktop</code>: a Tauri 2 shell whose <code>lib.rs</code> links the core, streams over the Channel API, and hosts the Hermes React dashboard against <code>claw-rpc</code> (d11, your call).</p>
 <p>Four rules hold in the product. Jev sorts a case into named buckets and never writes text or calls a tool. Every <code>choice</code> keeps a no-match option. <code>undecided</code> never means yes: it takes the safe default, which for a tool is "ask the user". Every verdict is logged with its masked question, number and latency.</p>
 <p>Where the speed comes from: a native binary with no runtime to start, many Jev questions in one call, Jev checks that run at the same time as the model stream, and skill selection by a verdict instead of a model planning turn.</p>
 
@@ -245,21 +275,26 @@ flowchart LR
 <p>The new part is the decision log. Every verdict is logged with its question, number and latency. When the outcome is known, the pair (verdict, outcome) is a free training and evaluation set for the question packs: a question whose verdicts are often overruled gets rewritten by the same loop.</p>
 
 <h2 id="phases">Phases</h2>
-<p>Nothing below has started. Each phase ends with a number, so "fastest" is always a measurement.</p>
+<p>Nothing below has started. Each phase ends with a number.</p>
 <div class="table-wrap"><table>
 <thead><tr><th>Phase</th><th>Build</th><th>Done when</th></tr></thead>
 <tbody>
-<tr><td class="num">0</td><td>Install the Rust toolchain. Workspace, CI, license, benchmark harness</td><td><code>cargo test</code> runs in CI. The harness prints cold start and one Jev round trip</td></tr>
-<tr><td class="num">1</td><td><code>jev-judge</code> crate and <code>claw-cli judge</code></td><td>Passes the same cases as the 109 TypeScript tests. Latency equal to or lower than the Bun judge</td></tr>
-<tr><td class="num">2</td><td><code>claw-core</code> loop, two providers, file and shell tools, Jev at the four named points, <code>claw-store</code></td><td>One real task runs end to end from the command line. Every verdict is in the log</td></tr>
-<tr><td class="num">3</td><td>MCP server, Stop hook, skills loader. Delete the TypeScript copy</td><td>Claude Code uses the Rust <code>jev_judge</code> tool. The repository is all Rust</td></tr>
-<tr><td class="num">4</td><td>Tauri 2 app that links the core</td><td>Chat streams over the Channel API. Tool approvals show in the app</td></tr>
-<tr><td class="num">5</td><td><code>claw-improve</code>: propose, score, candidate, accept, revert</td><td>One skill gets a strictly better score and one revert restores the old file exactly</td></tr>
-<tr><td class="num">6</td><td>Every-turn router experiment behind a flag. Benchmark against ZeroClaw and Hermes on the same tasks</td><td>A published table: cold start, time to first action, model turns per task, task success</td></tr>
+<tr><td class="num">0</td><td>Install Rust. Workspace, CI, license, benchmark harness. Freeze the Hermes RPC contract as a schema file</td><td><code>cargo test</code> in CI. The harness prints cold start and one Jev round trip. The contract schema validates against the Hermes TUI</td></tr>
+<tr><td class="num">1</td><td><code>jev-judge</code> and <code>claw-cli judge</code></td><td>Same cases as the 109 TypeScript tests pass. Latency equal or lower</td></tr>
+<tr><td class="num">2</td><td><code>claw-store</code>, <code>claw-providers</code> (two), <code>claw-tools</code> (core tools, local sandbox), <code>claw-turn</code>, <code>claw-compaction</code></td><td>One Hermes session transcript replays in Rust with the same tool calls. Cold start and first action measured</td></tr>
+<tr><td class="num">3</td><td><code>claw-orchestrator</code>: actors, mailboxes, task board, replayable log. Jev at gates</td><td>Three peers solve one task with messages between them, and the log replays it</td></tr>
+<tr><td class="num">4</td><td><code>claw-rpc</code> and the Tauri 2 shell with the Hermes dashboard</td><td>The Hermes TUI and the dashboard run unchanged against the Rust server</td></tr>
+<tr><td class="num">5</td><td><code>claw-skills</code> with the improvement loop, <code>claw-voice</code> on ElevenLabs</td><td>One skill scores strictly better and reverts. One voice call reaches the Rust agent as a tool</td></tr>
+<tr><td class="num">6</td><td>Benchmark against Python Hermes on the same tasks. Delete the TypeScript judge</td><td>Published table: cold start, time to first action, model turns per task, success rate</td></tr>
+<tr><td class="num">7+</td><td>Channels, cron, ACP, remaining 36 providers, dashboard server</td><td>Each ported behind the frozen contract</td></tr>
 </tbody></table></div>
 
 <h2 id="risks">Risks and open questions</h2>
 <ul class="plain">
+  <li><b>Size.</b> Hermes is 516,000 lines of Python and the port is a multi-release program for one owner plus agents. Phase 2 must prove the core is worth it before phase 7 starts.</li>
+  <li><b>The five hardest parts:</b> the compaction commit-fence semantics, the 1,863 lines of provider-specific recovery in <code>turn_recovery.py</code>, WAL and FTS5 with CJK parity, the 38-provider quirk matrix, and the gateway session lifecycle across 20 plus channels.</li>
+  <li><b>Jev voted against the multi-agent design</b> (d9, 0.82). The owner overruled it. Phase 3 must show peers talking is worth the extra design, or the plan falls back to the Jev pick.</li>
+  <li><b>ElevenLabs is a second vendor and a per-minute bill.</b> The voice trait keeps the exit open.</li>
   <li><b>Jev is one vendor and one network hop.</b> If it is down, every gate is <code>undecided</code> and the agent asks the user each time. The agent must stay usable in that mode.</li>
   <li><b>Jev was unsure on open questions today.</b> 22 of 22 design scores and 8 of 8 exclusivity checks were under the bar. Phase 2 measures the decided rate per question; a question under a set rate gets rewritten or removed.</li>
   <li><b>No official ZeroClaw speed numbers exist.</b> We measure ZeroClaw ourselves in phase 6 before any public claim.</li>
@@ -269,8 +304,8 @@ flowchart LR
 </ul>
 <h3>Open questions for you</h3>
 <ul class="tasks">
-  <li><input type="checkbox" id="q-d3"><label for="q-d3">d3: named points only, or every-turn router from the start?</label></li>
-  <li><input type="checkbox" id="q-d5"><label for="q-d5">d5: in-process core, or daemon from the start?</label></li>
+  <li><input type="checkbox" id="q-d11"><label for="q-d11">d11: Tauri 2 shell reusing the Hermes React dashboard, or a new small UI?</label></li>
+  <li><input type="checkbox" id="q-lic2"><label for="q-lic2">Does the Hermes MIT license and your fork stay as the upstream, with attribution in every ported crate?</label></li>
   <li><input type="checkbox" id="q-lic"><label for="q-lic">License for jev-claw: MIT, Apache-2.0, or both like ZeroClaw?</label></li>
   <li><input type="checkbox" id="q-key"><label for="q-key">Does TypeSafe allow a product to ship with user-supplied Jev keys, and what are the rate limits? Not checked yet.</label></li>
 </ul>
@@ -284,6 +319,7 @@ flowchart LR
   <li><a href="https://github.com/NousResearch/hermes-agent-self-evolution">NousResearch/hermes-agent-self-evolution</a>: README</li>
   <li><a href="https://github.com/ogarciarevett/vesper">ogarciarevett/vesper</a>: <code>auto-evolve</code>, <code>self-improve</code> and <code>skill-train</code> source</li>
   <li><a href="https://v2.tauri.app/release/tauri/">Tauri 2 releases</a>, <a href="https://v2.tauri.app/start/project-structure/">project structure</a>, <a href="https://v2.tauri.app/develop/calling-frontend/">calling the frontend</a>, <a href="https://v2.tauri.app/blog/tauri-20/">Tauri 2.0 announcement</a></li>
+  <li>Local clone of Hermes Agent at commit <code>e2f8a07</code> (2026-09-22), read with <code>wc -l</code>, <code>grep</code> and file reads. Fork: <a href="https://github.com/ogarciarevett/hermes-agent">ogarciarevett/hermes-agent</a></li>
   <li>Local: <code>scripts/jev/README.md</code>, <code>.agents/skills/jev/</code>, decision log <code>.local/jev-decisions/2026-09-21.jsonl</code></li>
 </ul>
 
