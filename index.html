@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>jev-claw Build Plan</title>
+</head>
+<body>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --ground: #F6F7F3;
+    --surface: #FFFFFF;
+    --ink: #1C2024;
+    --muted: #5F666C;
+    --rule: #D9DCD4;
+    --accent: #B94A1C;
+    --accent-ink: #FFFFFF;
+    --ok-bg: #E3F1E8; --ok-ink: #1F6B41;
+    --warn-bg: #FBEFD6; --warn-ink: #8A5A0B;
+    --grey-bg: #ECEEEA; --grey-ink: #4C5359;
+    --code-bg: #EEF0EA;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #15181B; --surface: #1D2126; --ink: #ECEDE8; --muted: #A2A8AD;
+      --rule: #333940; --accent: #E0743F; --accent-ink: #15181B;
+      --ok-bg: #1E3A2B; --ok-ink: #8FD6AA; --warn-bg: #3E2F12; --warn-ink: #F0C36A;
+      --grey-bg: #2A3036; --grey-ink: #C3C9CE; --code-bg: #262B31;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #15181B; --surface: #1D2126; --ink: #ECEDE8; --muted: #A2A8AD;
+    --rule: #333940; --accent: #E0743F; --accent-ink: #15181B;
+    --ok-bg: #1E3A2B; --ok-ink: #8FD6AA; --warn-bg: #3E2F12; --warn-ink: #F0C36A;
+    --grey-bg: #2A3036; --grey-ink: #C3C9CE; --code-bg: #262B31;
+  }
+  * { box-sizing: border-box; }
+  body {
+    background: var(--ground); color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 16px; line-height: 1.55;
+    padding-inline: 16px; padding-block: 0 64px;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  h1, h2, h3 { font-family: "Bricolage Grotesque", "IBM Plex Sans", system-ui, sans-serif; text-wrap: balance; line-height: 1.15; margin: 0; }
+  h1 { font-size: clamp(2rem, 6vw, 3.2rem); font-weight: 700; letter-spacing: -0.02em; }
+  h2 { font-size: 1.5rem; font-weight: 700; padding-top: 48px; margin-bottom: 12px; scroll-margin-top: 72px; }
+  h3 { font-size: 1.1rem; font-weight: 700; margin-top: 24px; margin-bottom: 6px; }
+  p { margin: 0 0 12px; max-width: 68ch; }
+  a { color: var(--accent); }
+  code { font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace; font-size: 0.88em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+  .eyebrow { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  header { padding-block: 40px 24px; border-bottom: 1px solid var(--rule); }
+  header .lead { font-size: 1.15rem; margin-top: 16px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 20px; color: var(--muted); font-size: 0.9rem; margin-top: 12px; }
+  nav { position: sticky; top: env(safe-area-inset-top, 0px); background: var(--ground); border-bottom: 1px solid var(--rule); z-index: 2; }
+  nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  nav li a { display: block; padding: 10px 10px; white-space: nowrap; color: var(--muted); text-decoration: none; font-size: 0.9rem; border-bottom: 2px solid transparent; }
+  nav li a:hover, nav li a:focus-visible { color: var(--ink); border-bottom-color: var(--accent); outline: none; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 24px 0; }
+  .stat { background: var(--surface); border: 1px solid var(--rule); padding: 14px 16px; }
+  .stat b { display: block; font-family: "Bricolage Grotesque", sans-serif; font-size: 1.8rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stat span { color: var(--muted); font-size: 0.85rem; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--rule); background: var(--surface); margin: 12px 0 16px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--rule); }
+  th { font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--ground); }
+  tr:last-child td { border-bottom: none; }
+  td.num { font-family: "IBM Plex Mono", monospace; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; white-space: nowrap; }
+  .ok { background: var(--ok-bg); color: var(--ok-ink); }
+  .warn { background: var(--warn-bg); color: var(--warn-ink); }
+  .grey { background: var(--grey-bg); color: var(--grey-ink); }
+  .ask { background: var(--surface); border-left: 4px solid var(--accent); padding: 14px 18px; margin: 16px 0; }
+  .ask h3 { margin-top: 0; }
+  .ask ol { margin: 0; padding-left: 20px; }
+  .ask li { margin-bottom: 10px; }
+  ul.plain { padding-left: 20px; margin: 0 0 12px; max-width: 72ch; }
+  ul.plain li { margin-bottom: 6px; }
+  pre.mermaid { background: var(--surface); border: 1px solid var(--rule); padding: 16px; overflow-x: auto; margin: 12px 0 16px; }
+  .tasks { list-style: none; padding: 0; margin: 0 0 12px; }
+  .tasks li { padding: 8px 0; border-bottom: 1px solid var(--rule); display: flex; gap: 10px; align-items: flex-start; }
+  .tasks input { margin-top: 5px; accent-color: var(--accent); }
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 0.85rem; }
+  @media (max-width: 560px) { h2 { padding-top: 36px; } th, td { padding: 8px 10px; } }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Plan · Not built · 2026-09-22</div>
+  <h1>jev-claw Build Plan</h1>
+  <p class="lead">A new small Rust workspace. Port the Jev judge to Rust first. Put Jev at named decision points in the agent loop. Let the agent improve only skill text and question packs, with a person accepting each change. Desktop app on Tauri 2.</p>
+  <div class="meta"><span>Owner: Omar Garcia</span><span>Judge: <code>jev-1.13.0</code></span><span>Decision log: <code>.local/jev-decisions/2026-09-21.jsonl</code></span></div>
+</header>
+
+<nav aria-label="Sections"><ul>
+  <li><a href="#final">Final decisions</a></li>
+  <li><a href="#log">Decision log</a></li>
+  <li><a href="#goal">Goal</a></li>
+  <li><a href="#copied">Copied today</a></li>
+  <li><a href="#borrow">What we borrow</a></li>
+  <li><a href="#arch">Architecture</a></li>
+  <li><a href="#improve">Self-improvement</a></li>
+  <li><a href="#phases">Phases</a></li>
+  <li><a href="#risks">Risks</a></li>
+  <li><a href="#sources">Sources</a></li>
+</ul></nav>
+
+<div class="stats">
+  <div class="stat"><b>239 ms</b><span>Jev median, one call, this machine</span></div>
+  <div class="stat"><b>8 in 644 ms</b><span>choice verdicts in one call</span></div>
+  <div class="stat"><b>3 of 8</b><span>decisions Jev settled, all matching Claude</span></div>
+  <div class="stat"><b>0 of 22</b><span>open design scores Jev was sure on</span></div>
+</div>
+
+<h2 id="final">Final decisions</h2>
+<p>Jev decided 3 of 8. Five took their safe default (the option that changes least). Two need you. Nothing is built.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>#</th><th>Decision</th><th>Final</th><th>Who decided</th></tr></thead>
+<tbody>
+<tr><td class="num">d1</td><td>Build first</td><td>The Jev judge as a Rust crate and command line</td><td><span class="pill ok">Jev 0.81</span> same as Claude</td></tr>
+<tr><td class="num">d2</td><td>Code base</td><td>New workspace that borrows ZeroClaw designs and snippets with attribution. No fork</td><td><span class="pill warn">Safe default</span> Jev unsure 0.61, same as Claude</td></tr>
+<tr><td class="num">d3</td><td>Jev in the loop</td><td>Named points only: tool risk gate, skill selection, stop or continue, memory write. Every-turn router as a flagged experiment</td><td><span class="pill warn">Safe default</span> Claude wanted the router. Jev unsure 0.37. <b>Your call</b></td></tr>
+<tr><td class="num">d4</td><td>Self-improvement scope</td><td>Skill text and Jev question packs only. A person accepts. Revert by file. No self-written code</td><td><span class="pill ok">Jev 0.87</span> same as Claude</td></tr>
+<tr><td class="num">d5</td><td>App and core</td><td>The Tauri 2 app links the core crate in process. The command line links the same crate</td><td><span class="pill warn">Safe default</span> Jev unsure 0.56, same as Claude. <b>Your call</b></td></tr>
+<tr><td class="num">d6</td><td>Memory and run log</td><td>One SQLite file with full-text search. Skills stay as <code>SKILL.md</code> files</td><td><span class="pill grey">Claude</span> Jev said unclear 0.92</td></tr>
+<tr><td class="num">d7</td><td>Providers</td><td>Own small trait, two providers: Anthropic and any OpenAI-compatible endpoint</td><td><span class="pill warn">Safe default</span> Jev unsure 0.50, same as Claude</td></tr>
+<tr><td class="num">d8</td><td>TypeScript copy</td><td>Keep as the test oracle until the Rust judge passes the same cases, then delete</td><td><span class="pill ok">Jev 0.94</span> same as Claude</td></tr>
+</tbody></table></div>
+<p>Why Claude keeps SQLite for d6 after Jev said "unclear": the improvement loop must join each verdict to its later outcome. That is a query, not a file read. ZeroClaw and Hermes both use SQLite for memory.</p>
+
+<div class="ask">
+  <h3>Two decisions need you</h3>
+  <ol>
+    <li><b>d3, every-turn router.</b> Option A: named points only in release 1, router as an experiment (recommended). Option B: router on every turn from the start. A is safer because Jev was unsure on 22 of 22 open scores today. B is the bolder speed story: the model call can start in parallel and be cancelled, so the router adds no wait.</li>
+    <li><b>d5, daemon.</b> Option A: in-process core for release 1 (recommended). Option B: daemon plus clients from the start. Choose B only if release 1 must run schedules or chat channels while the app is closed. ZeroClaw and Hermes both chose B.</li>
+  </ol>
+</div>
+
+<h2 id="log">Decision log</h2>
+<p>Claude wrote the inventory and its own pick first, then asked with neutral text and the same ten facts for every option. 32 calls, all logged with <code>--log</code>.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>id</th><th>Decision</th><th>Options</th><th>Claude pick</th><th>Jev verdict</th><th>Number</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td class="num">d1</td><td>What is built first</td><td><code>rust_judge_first</code> <code>agent_loop_first</code> <code>desktop_shell_first</code></td><td><code>rust_judge_first</code></td><td><span class="pill ok">rust_judge_first</span></td><td class="num">0.81</td><td>Followed</td></tr>
+<tr><td class="num">d2</td><td>Where the Rust code starts</td><td><code>fork_zeroclaw</code> <code>greenfield_borrow</code> <code>depend_on_zeroclaw_crates</code></td><td><code>greenfield_borrow</code></td><td><span class="pill warn">undecided</span></td><td class="num">0.61</td><td>Safe default <code>greenfield_borrow</code></td></tr>
+<tr><td class="num">d3</td><td>Where Jev sits in the loop</td><td><code>jev_every_turn_router</code> <code>jev_named_points</code> <code>jev_post_hoc</code></td><td><code>jev_every_turn_router</code></td><td><span class="pill warn">undecided</span></td><td class="num">0.37</td><td>Safe default <code>jev_named_points</code>. Claude pick not taken</td></tr>
+<tr><td class="num">d4</td><td>Self-improvement scope</td><td><code>skills_and_question_packs</code> <code>plus_memory_and_thresholds</code> <code>plus_code</code></td><td><code>skills_and_question_packs</code></td><td><span class="pill ok">skills_and_question_packs</span></td><td class="num">0.87</td><td>Followed</td></tr>
+<tr><td class="num">d5</td><td>How the app reaches the core</td><td><code>linked_core</code> <code>daemon_and_clients</code></td><td><code>linked_core</code></td><td><span class="pill warn">undecided</span></td><td class="num">0.56</td><td>Safe default <code>linked_core</code></td></tr>
+<tr><td class="num">d6</td><td>Store for memory and run log</td><td><code>sqlite_fts5</code> <code>markdown_files</code> <code>vector_store</code></td><td><code>sqlite_fts5</code></td><td><span class="pill grey">unclear</span></td><td class="num">0.92</td><td>Facts do not separate the options. Safe default <code>sqlite_fts5</code></td></tr>
+<tr><td class="num">d7</td><td>Model provider layer</td><td><code>own_thin_trait</code> <code>existing_llm_crate</code></td><td><code>own_thin_trait</code></td><td><span class="pill warn">undecided</span></td><td class="num">0.50</td><td>Safe default <code>own_thin_trait</code></td></tr>
+<tr><td class="num">d8</td><td>Fate of the TypeScript judge</td><td><code>keep_as_oracle_then_delete</code> <code>keep_forever</code> <code>delete_now</code></td><td><code>keep_as_oracle_then_delete</code></td><td><span class="pill ok">keep_as_oracle_then_delete</span></td><td class="num">0.94</td><td>Followed</td></tr>
+</tbody></table></div>
+<p>The eight verdicts came from one call of 644 ms that carried eight <code>choice</code> questions. That was round two.</p>
+<p>Round one used the shipped <code>design_option_fit</code> score question, once per option: 22 calls of 564 to 748 ms. All 22 came back <code>undecided</code>, confidence 0.00 to 0.74. The Jev skill allows one retry with a better shape, never three, so round two was the only retry.</p>
+<p>Checks on the inventory: <code>inventory_is_complete</code> was <code>yes</code> at 0.89. <code>decision_class</code> was <code>design</code> for all eight (0.86 to 1.00), so no row is a stop-and-ask class. <code>options_are_exclusive</code> was <code>undecided</code> for all eight (0.42 to 0.69).</p>
+<p><b>What this teaches the product:</b> Jev was sure on every sorting question (8 of 8) and unsure on every open design score (0 of 22). An agent built on Jev must ask it to sort a case into named buckets, and must not ask it to weigh designs. That is a measured fact in favour of <code>jev_named_points</code> for d3.</p>
+
+<h2 id="goal">Goal</h2>
+<p>jev-claw is an agent that lets a fast judge make the small decisions, so the slow model runs only when text is needed. The judge is Jev, the TypeSafe model that returns a typed verdict (yes or no, one choice, or a score) with a number, and never writes text.</p>
+<p>Measured today with <code>bun scripts/jev/jev-smoke.ts --calls 5</code>: 239 ms median, 643 ms worst. One call carries many questions, and they run in parallel. A normal model turn takes seconds. That gap is the product.</p>
+<p>"Fastest" needs a number before it is a claim. The plan measures three things from the first phase: cold start of the binary, time from user input to first useful action, and the count of slow model turns that a Jev verdict replaced.</p>
+
+<h2 id="copied">Copied today</h2>
+<p>The Jev tooling and skills from <code>edel-perps-backend</code> are now in <code>jev-claw</code> at the same paths, not committed.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>What</th><th>Path in jev-claw</th></tr></thead>
+<tbody>
+<tr><td>Jev skill and its four references</td><td><code>.agents/skills/jev/</code></td></tr>
+<tr><td>TypeSafe skill and its license</td><td><code>.agents/skills/typesafe-ai/</code></td></tr>
+<tr><td>Judge module, command line, MCP server, Stop hook, latency smoke, mask, stdin</td><td><code>scripts/jev/</code></td></tr>
+<tr><td>Two question packs</td><td><code>scripts/jev/questions/</code></td></tr>
+<tr><td>Text sanitizer that the mask needs</td><td><code>scripts/public-text-sanitizer.ts</code></td></tr>
+<tr><td>Seven judge test suites</td><td><code>scripts/test/pipeline-2/</code></td></tr>
+<tr><td>Boundary test</td><td><code>tests/pipeline-2/jev-operations-boundary.test.ts</code></td></tr>
+</tbody></table></div>
+<p>Two small changes made the copy run. The sanitizer imported one constant from the Edel contracts package, so that constant is now inline. A new <code>.gitignore</code> keeps <code>.local/</code> out of git.</p>
+<p>Test result: 109 pass, 2 fail, 1 load error, 111 tests in 8 files. Both causes are ties to the Edel repository. The boundary test reads an Edel <code>package.json</code>, and <code>jev-question-pack.test.ts</code> imports <code>packages/contracts/src/eval-status</code>. These stay until the Rust port replaces them.</p>
+
+<h2 id="borrow">What we borrow</h2>
+<p>Only ZeroClaw is Rust, so it is the only source of code. Hermes and Vesper give ideas.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Project</th><th>What it is</th><th>License</th><th>Take</th><th>Leave</th></tr></thead>
+<tbody>
+<tr><td><a href="https://github.com/zeroclaw-labs/zeroclaw">ZeroClaw</a></td><td>Rust agent runtime, about 20 crates, 7 months old, pushed 2026-09-21</td><td>MIT or Apache-2.0</td><td>One trait per concern (<code>Tool</code>, <code>ModelProvider</code>), one TOML config, supervised autonomy, OS sandbox, Agent Client Protocol</td><td>SOP graph and routines, hardware crates, 20 providers on day one</td></tr>
+<tr><td><a href="https://github.com/NousResearch/hermes-agent">Hermes Agent</a></td><td>Python agent with a learning loop, very active</td><td>MIT</td><td><code>SKILL.md</code> skills, "write a skill after a hard task, refine on reuse", SQLite memory with FTS5, run and improve as two jobs</td><td>The 20 plus state modules, the Python runtime</td></tr>
+<tr><td><a href="https://github.com/NousResearch/hermes-agent/tree/main/apps/desktop">Hermes Desktop</a></td><td><code>apps/desktop</code> in the same repo. Electron plus React over JSON-RPC on WebSocket</td><td>MIT</td><td>Three layers: native shell, web chat UI, headless agent. One code path for local and remote</td><td>Electron, a second language runtime as backend</td></tr>
+<tr><td><a href="https://github.com/ogarciarevett/vesper">Vesper</a></td><td>Your local-first agent runtime, TypeScript on Bun, Tauri 2 shell</td><td>MIT</td><td>The self-improvement loop, the capability list per task, the Tauri 2 shell as reference</td><td>"Shell out to a CLI" model, Bun process code</td></tr>
+</tbody></table></div>
+<p>Two facts change the plan. ZeroClaw already ships a Tauri 2 app in <code>apps/tauri</code>, and it is a thin tray client that calls a separate daemon over HTTP. ZeroClaw publishes no speed numbers: the "8.8 MB, under 10 ms" figures are on third-party sites only, so we must measure both ourselves.</p>
+<p>One license trap: the planned "Darwinian Evolver" in <a href="https://github.com/NousResearch/hermes-agent-self-evolution">hermes-agent-self-evolution</a> is AGPLv3. Do not link it. jev-claw does not need it.</p>
+<p>Tauri 2 facts: stable is 2.11.5 (2026-07-01). App logic lives in a library crate, so a CLI crate can share it. The Channel API is the documented way to stream tokens to the webview. iOS and Android work, but not every plugin supports them.</p>
+
+<h2 id="arch">Architecture</h2>
+<p>One Cargo workspace. One core library. Two thin front ends (command line and Tauri 2 app) that link it. Seven crates in release 1, against about 20 in ZeroClaw.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Crate</th><th>Job</th><th>Comes from</th></tr></thead>
+<tbody>
+<tr><td><code>jev-judge</code></td><td>Typed client for Jev: <code>noul</code>, <code>choice</code>, <code>score</code>. Threshold, <code>undecided</code> on every failure, retry only on 429, mask before send, decision log</td><td>Port of <code>judge.ts</code> and <code>mask.ts</code></td></tr>
+<tr><td><code>claw-core</code></td><td>The agent loop, the <code>Tool</code> and <code>ModelProvider</code> traits, the decision points, the autonomy policy</td><td>ZeroClaw trait split, Jev skill protocol</td></tr>
+<tr><td><code>claw-providers</code></td><td>Anthropic and OpenAI-compatible streaming clients</td><td>Own code</td></tr>
+<tr><td><code>claw-tools</code></td><td>File, shell, web fetch, MCP client. Each tool declares a risk level and capabilities</td><td>ZeroClaw supervised autonomy, Vesper capability list</td></tr>
+<tr><td><code>claw-store</code></td><td>One SQLite file: sessions, memory with FTS5, run log, verdict and outcome pairs</td><td>Hermes and ZeroClaw memory design</td></tr>
+<tr><td><code>claw-improve</code></td><td>Gather, propose, score on held-out tasks, candidate, accept, revert</td><td>Vesper <code>auto-evolve</code> and <code>skill-train</code></td></tr>
+<tr><td><code>claw-cli</code></td><td>Command line, MCP server with the <code>jev_judge</code> tool, Claude Code Stop hook</td><td>Port of <code>jev-judge.ts</code>, <code>jev-mcp-server.ts</code>, <code>jev-stop-hook.ts</code></td></tr>
+</tbody></table></div>
+<p>The desktop app is <code>apps/desktop</code>: a Tauri 2 shell whose <code>lib.rs</code> links <code>claw-core</code>, streams model output over the Channel API, and keeps keys in the OS keychain. The shell owns files and windows, the web view owns the chat.</p>
+<pre class="mermaid">
+flowchart TD
+  U[User input] --> S[Jev: pick skill or none]
+  S --> M[Model turn: streams text and tool calls]
+  M --> R[Jev: tool risk gate]
+  R -->|safe| T[Run tool]
+  R -->|risky or undecided| H[Ask the user]
+  T --> C[Jev: stop or continue]
+  H --> C
+  C -->|continue| M
+  C -->|stop| W[Jev: worth a memory write?]
+  W --> L[Run log and verdict log]
+</pre>
+<p>Four rules hold in the product. Jev sorts a case into named buckets and never writes text or calls a tool. Every <code>choice</code> keeps a no-match option. <code>undecided</code> never means yes: it takes the safe default, which for a tool is "ask the user". Every verdict is logged with its masked question, number and latency.</p>
+<p>Where the speed comes from: a native binary with no runtime to start, many Jev questions in one call, Jev checks that run at the same time as the model stream, and skill selection by a verdict instead of a model planning turn.</p>
+
+<h2 id="improve">Self-improvement loop</h2>
+<p>The loop comes from Vesper. jev-claw takes the ideas, not the code.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Vesper part</th><th>What it does</th><th>What jev-claw takes</th></tr></thead>
+<tbody>
+<tr><td><code>auto-evolve</code></td><td>A daily task reads run and error counts, asks a model for skill and fix proposals as JSON, and records them. It installs a skill only from an allowlist, only when switched on</td><td>The gather, reflect, parse, propose steps as Rust types. Jev scores each proposal before a person sees it</td></tr>
+<tr><td><code>skill-train</code></td><td>Rewrites one <code>SKILL.md</code>, tests it on tasks it did not train on, keeps it only if strictly better. A person runs <code>accept</code>. <code>revert</code> restores the old file</td><td>The same accept rule. Jev <code>score</code> verdicts replace the slow model-as-judge scorer</td></tr>
+<tr><td><code>self-improve</code></td><td>Runs health checks first and hands code work to a separate pipeline under human review</td><td>The rule that code changes are proposals only</td></tr>
+</tbody></table></div>
+<pre class="mermaid">
+flowchart LR
+  A[Run log: verdicts and outcomes] --> B[Gather digest]
+  B --> C[Model proposes skill text change]
+  C --> D[Jev scores on held-out tasks]
+  D -->|strictly better| E[Candidate file]
+  D -->|not better| F[Drop]
+  E --> G[Owner accepts or reverts]
+</pre>
+<p>Guards that stay: untrusted run data is length-capped and framed as data; a malformed model reply changes nothing; a process argument comes only from an allowlist; propose is automatic and apply is a human command; every accepted change has a checkpoint and a revert.</p>
+<p>The new part is the decision log. Every verdict is logged with its question, number and latency. When the outcome is known, the pair (verdict, outcome) is a free training and evaluation set for the question packs: a question whose verdicts are often overruled gets rewritten by the same loop.</p>
+
+<h2 id="phases">Phases</h2>
+<p>Nothing below has started. Each phase ends with a number, so "fastest" is always a measurement.</p>
+<div class="table-wrap"><table>
+<thead><tr><th>Phase</th><th>Build</th><th>Done when</th></tr></thead>
+<tbody>
+<tr><td class="num">0</td><td>Install the Rust toolchain. Workspace, CI, license, benchmark harness</td><td><code>cargo test</code> runs in CI. The harness prints cold start and one Jev round trip</td></tr>
+<tr><td class="num">1</td><td><code>jev-judge</code> crate and <code>claw-cli judge</code></td><td>Passes the same cases as the 109 TypeScript tests. Latency equal to or lower than the Bun judge</td></tr>
+<tr><td class="num">2</td><td><code>claw-core</code> loop, two providers, file and shell tools, Jev at the four named points, <code>claw-store</code></td><td>One real task runs end to end from the command line. Every verdict is in the log</td></tr>
+<tr><td class="num">3</td><td>MCP server, Stop hook, skills loader. Delete the TypeScript copy</td><td>Claude Code uses the Rust <code>jev_judge</code> tool. The repository is all Rust</td></tr>
+<tr><td class="num">4</td><td>Tauri 2 app that links the core</td><td>Chat streams over the Channel API. Tool approvals show in the app</td></tr>
+<tr><td class="num">5</td><td><code>claw-improve</code>: propose, score, candidate, accept, revert</td><td>One skill gets a strictly better score and one revert restores the old file exactly</td></tr>
+<tr><td class="num">6</td><td>Every-turn router experiment behind a flag. Benchmark against ZeroClaw and Hermes on the same tasks</td><td>A published table: cold start, time to first action, model turns per task, task success</td></tr>
+</tbody></table></div>
+
+<h2 id="risks">Risks and open questions</h2>
+<ul class="plain">
+  <li><b>Jev is one vendor and one network hop.</b> If it is down, every gate is <code>undecided</code> and the agent asks the user each time. The agent must stay usable in that mode.</li>
+  <li><b>Jev was unsure on open questions today.</b> 22 of 22 design scores and 8 of 8 exclusivity checks were under the bar. Phase 2 measures the decided rate per question; a question under a set rate gets rewritten or removed.</li>
+  <li><b>No official ZeroClaw speed numbers exist.</b> We measure ZeroClaw ourselves in phase 6 before any public claim.</li>
+  <li><b>Masking moves with the judge.</b> The copied mask has Edel patterns. The Rust port needs a general list plus a per-user list.</li>
+  <li><b>The copied skill text is Edel-specific.</b> The money path class must become a general "stop and ask a person" class that each user sets.</li>
+  <li><b>The Rust toolchain is not on this machine.</b> <code>cargo</code> and <code>rustc</code> were not found.</li>
+</ul>
+<h3>Open questions for you</h3>
+<ul class="tasks">
+  <li><input type="checkbox" id="q-d3"><label for="q-d3">d3: named points only, or every-turn router from the start?</label></li>
+  <li><input type="checkbox" id="q-d5"><label for="q-d5">d5: in-process core, or daemon from the start?</label></li>
+  <li><input type="checkbox" id="q-lic"><label for="q-lic">License for jev-claw: MIT, Apache-2.0, or both like ZeroClaw?</label></li>
+  <li><input type="checkbox" id="q-key"><label for="q-key">Does TypeSafe allow a product to ship with user-supplied Jev keys, and what are the rate limits? Not checked yet.</label></li>
+</ul>
+
+<h2 id="sources">Sources</h2>
+<p>Read on 2026-09-22. Two research agents read the repositories and docs. Claude ran the Jev calls and the tests.</p>
+<ul class="plain">
+  <li><a href="https://github.com/zeroclaw-labs/zeroclaw">zeroclaw-labs/zeroclaw</a>: README, architecture overview, workspace listing, <code>apps/tauri/Cargo.toml</code></li>
+  <li><a href="https://github.com/NousResearch/hermes-agent">NousResearch/hermes-agent</a>: README and repository listing</li>
+  <li><a href="https://github.com/NousResearch/hermes-agent/tree/main/apps/desktop">Hermes Desktop, <code>apps/desktop</code></a>: README</li>
+  <li><a href="https://github.com/NousResearch/hermes-agent-self-evolution">NousResearch/hermes-agent-self-evolution</a>: README</li>
+  <li><a href="https://github.com/ogarciarevett/vesper">ogarciarevett/vesper</a>: <code>auto-evolve</code>, <code>self-improve</code> and <code>skill-train</code> source</li>
+  <li><a href="https://v2.tauri.app/release/tauri/">Tauri 2 releases</a>, <a href="https://v2.tauri.app/start/project-structure/">project structure</a>, <a href="https://v2.tauri.app/develop/calling-frontend/">calling the frontend</a>, <a href="https://v2.tauri.app/blog/tauri-20/">Tauri 2.0 announcement</a></li>
+  <li>Local: <code>scripts/jev/README.md</code>, <code>.agents/skills/jev/</code>, decision log <code>.local/jev-decisions/2026-09-21.jsonl</code></li>
+</ul>
+
+<footer>Plan only. Nothing built, nothing committed. Living copy in the shared doc; this page is the read-only snapshot of 2026-09-22.</footer>
+</div>
+
+<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs"; mermaid.initialize({startOnLoad:true, theme: window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "default"});</script>
+</body>
+</html>
