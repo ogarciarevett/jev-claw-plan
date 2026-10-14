@@ -92,7 +92,7 @@
   <div class="eyebrow">Plan · Revision 2.1 · Opus 5.5 + Jev · Not built · 2026-09-22</div>
   <h1>jev-claw Build Plan</h1>
   <p class="lead">Fork Hermes Agent and rebuild it entirely in Rust: the runtime core first, behind the Hermes RPC contract. Every agent is an actor with a mailbox inside one Rust daemon, so peers talk while they run. Jev decides the gates. Voice on ElevenLabs. Desktop on Tauri 2.</p>
-  <div class="meta"><span>Owner: Omar Garcia</span><span>Judge: <code>jev-1.13.0</code></span><span>Decision log: <code>.local/jev-decisions/2026-09-21.jsonl</code></span></div>
+  <div class="meta"><span>Owner: Omar Garcia</span><span>Judge: <code>jev-1.13.0</code></span><span>Decision log: <code>2026-09-21</code></span></div>
 </header>
 
 <nav aria-label="Sections"><ul>
@@ -195,24 +195,24 @@
 
 <h2 id="goal">Goal</h2>
 <p>jev-claw is an agent that lets a fast judge make the small decisions, so the slow model runs only when text is needed. The judge is Jev, the TypeSafe model that returns a typed verdict (yes or no, one choice, or a score) with a number, and never writes text.</p>
-<p>Measured today with <code>bun scripts/jev/jev-smoke.ts --calls 5</code>: 239 ms median, 643 ms worst. One call carries many questions, and they run in parallel. A normal model turn takes seconds. That gap is the product.</p>
+<p>Measured today with a five-call latency smoke test: 239 ms median, 643 ms worst. One call carries many questions, and they run in parallel. A normal model turn takes seconds. That gap is the product.</p>
 <p>"Fastest" needs a number before it is a claim. The plan measures three things from the first phase: cold start of the binary, time from user input to first useful action, and the count of slow model turns that a Jev verdict replaced.</p>
 
 <h2 id="copied">Copied today</h2>
-<p>The Jev tooling and skills from <code>edel-perps-backend</code> are now in <code>jev-claw</code> at the same paths, not committed.</p>
+<p>The Jev tooling and skills from a private project are now in <code>jev-claw</code> with the same directory structure, not committed.</p>
 <div class="table-wrap"><table>
-<thead><tr><th>What</th><th>Path in jev-claw</th></tr></thead>
+<thead><tr><th>What</th><th>Area in jev-claw</th></tr></thead>
 <tbody>
-<tr><td>Jev skill and its four references</td><td><code>.agents/skills/jev/</code></td></tr>
-<tr><td>TypeSafe skill and its license</td><td><code>.agents/skills/typesafe-ai/</code></td></tr>
-<tr><td>Judge module, command line, MCP server, Stop hook, latency smoke, mask, stdin</td><td><code>scripts/jev/</code></td></tr>
-<tr><td>Two question packs</td><td><code>scripts/jev/questions/</code></td></tr>
-<tr><td>Text sanitizer that the mask needs</td><td><code>scripts/public-text-sanitizer.ts</code></td></tr>
-<tr><td>Seven judge test suites</td><td><code>scripts/test/pipeline-2/</code></td></tr>
-<tr><td>Boundary test</td><td><code>tests/pipeline-2/jev-operations-boundary.test.ts</code></td></tr>
+<tr><td>Jev skill and its four references</td><td><code>Jev skill directory</code></td></tr>
+<tr><td>TypeSafe skill and its license</td><td><code>TypeSafe skill directory</code></td></tr>
+<tr><td>Judge module, command line, MCP server, Stop hook, latency smoke, mask, stdin</td><td><code>Judge tooling directory</code></td></tr>
+<tr><td>Two question packs</td><td><code>Question pack directory</code></td></tr>
+<tr><td>Text sanitizer that the mask needs</td><td><code>Text sanitizer module</code></td></tr>
+<tr><td>Seven judge test suites</td><td><code>Judge test directory</code></td></tr>
+<tr><td>Boundary test</td><td><code>Operations boundary test</code></td></tr>
 </tbody></table></div>
-<p>Two small changes made the copy run. The sanitizer imported one constant from the Edel contracts package, so that constant is now inline. A new <code>.gitignore</code> keeps <code>.local/</code> out of git.</p>
-<p>Test result: 109 pass, 2 fail, 1 load error, 111 tests in 8 files. Both causes are ties to the Edel repository. The boundary test reads an Edel <code>package.json</code>, and <code>jev-question-pack.test.ts</code> imports <code>packages/contracts/src/eval-status</code>. These stay until the Rust port replaces them.</p>
+<p>Two small changes made the copy run. The sanitizer imported one constant from a private project's contracts package, so that constant is now inline. A new <code>.gitignore</code> keeps local artifacts out of git.</p>
+<p>Test result: 109 pass, 2 fail, 1 load error, 111 tests in 8 files. Both causes are ties to a private repository. The boundary test reads that project's package manifest, and the question pack test imports its evaluation status module. These stay until the Rust port replaces them.</p>
 
 <h2 id="borrow">What we borrow</h2>
 <p><b>Revision:</b> Hermes Agent is now the base, not a source of ideas. A mapper read the clone at commit <code>e2f8a07</code> (2026-09-22). Hermes is 516,287 lines of Python: agent 124,555, tools 115,108, hermes_cli 233,329, gateway 92,952, tui_gateway 37,795, plugins 90,503, cron 16,850, state 18,413. The Electron desktop app is about 641,000 lines of TypeScript, the TUI about 101,000, the web dashboard about 57,000. Delegation is real: a parent spawns children in parallel, joined or detached, with list, steer and stop. There is no peer-to-peer agent protocol; a shared SQLite kanban board is the only coordination between independent agents. That gap is what jev-claw fills.</p>
@@ -234,7 +234,7 @@
 <div class="table-wrap"><table>
 <thead><tr><th>Crate</th><th>Hermes source</th><th>Lines today</th><th>Strategy</th></tr></thead>
 <tbody>
-<tr><td><code>jev-judge</code></td><td>new, port of <code>scripts/jev</code></td><td class="num">1,200 (TS)</td><td>Port with the 109 tests as oracle</td></tr>
+<tr><td><code>jev-judge</code></td><td>new, port of the existing judge tooling</td><td class="num">1,200 (TS)</td><td>Port with the 109 tests as oracle</td></tr>
 <tr><td><code>claw-turn</code></td><td><code>agent/conversation_loop.py</code>, <code>turn_*.py</code>, <code>tool_executor.py</code></td><td class="num">~8,000</td><td>Redesign: the reflection phase dispatch becomes a typed state machine</td></tr>
 <tr><td><code>claw-compaction</code></td><td><code>agent/context_compressor.py</code>, <code>conversation_compression.py</code></td><td class="num">~10,000</td><td>Keep the head and tail protect, middle summarize algorithm. Redesign the thread plumbing</td></tr>
 <tr><td><code>claw-tools</code></td><td><code>tools/registry.py</code>, <code>toolsets.py</code>, <code>model_tools.py</code>, core tools</td><td class="num">~45 tools</td><td>Trait registry with compile-time registration and tokio tasks</td></tr>
@@ -314,8 +314,8 @@ flowchart LR
   <li><b>Jev is one vendor and one network hop.</b> If it is down, every gate is <code>undecided</code> and the agent asks the user each time. The agent must stay usable in that mode.</li>
   <li><b>Jev was unsure on open questions today.</b> 22 of 22 design scores and 8 of 8 exclusivity checks were under the bar. Phase 2 measures the decided rate per question; a question under a set rate gets rewritten or removed.</li>
   <li><b>No official ZeroClaw speed numbers exist.</b> We measure ZeroClaw ourselves in phase 6 before any public claim.</li>
-  <li><b>Masking moves with the judge.</b> The copied mask has Edel patterns. The Rust port needs a general list plus a per-user list.</li>
-  <li><b>The copied skill text is Edel-specific.</b> The money path class must become a general "stop and ask a person" class that each user sets.</li>
+  <li><b>Masking moves with the judge.</b> The copied mask has patterns from a private project. The Rust port needs a general list plus a per-user list.</li>
+  <li><b>The copied skill text is specific to a private project.</b> The money path class must become a general "stop and ask a person" class that each user sets.</li>
   <li><b>The Rust toolchain is not on this machine.</b> <code>cargo</code> and <code>rustc</code> were not found.</li>
 </ul>
 <h3>Open questions for you</h3>
@@ -336,7 +336,7 @@ flowchart LR
   <li><a href="https://github.com/ogarciarevett/vesper">ogarciarevett/vesper</a>: <code>auto-evolve</code>, <code>self-improve</code> and <code>skill-train</code> source</li>
   <li><a href="https://v2.tauri.app/release/tauri/">Tauri 2 releases</a>, <a href="https://v2.tauri.app/start/project-structure/">project structure</a>, <a href="https://v2.tauri.app/develop/calling-frontend/">calling the frontend</a>, <a href="https://v2.tauri.app/blog/tauri-20/">Tauri 2.0 announcement</a></li>
   <li>Local clone of Hermes Agent at commit <code>e2f8a07</code> (2026-09-22), read with <code>wc -l</code>, <code>grep</code> and file reads. Fork: <a href="https://github.com/ogarciarevett/hermes-agent">ogarciarevett/hermes-agent</a></li>
-  <li>Local: <code>scripts/jev/README.md</code>, <code>.agents/skills/jev/</code>, decision log <code>.local/jev-decisions/2026-09-21.jsonl</code></li>
+  <li>Local: judge tooling documentation, Jev skill references, decision log for <code>2026-09-21</code></li>
 </ul>
 
 <footer>Plan only. Nothing built, nothing committed. Living copy in the shared doc; this page is the read-only snapshot of 2026-09-22.</footer>
